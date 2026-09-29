@@ -30,17 +30,23 @@ There is no walk button/state and no separate run button.
 For editor testing, WASD also drives the same run movement.
 
 ## Gameplay HUD
-The generated HUD is only a functional placeholder.
-Approved rules remain:
-- nickname
-- level
-- health bar + number
-- armor bar + number
-- food number only
-- water number only
-- no top EXP bar
-- thin EXP bar bottom-center
-- no quick slots
+The generated gameplay HUD is now the production UI foundation rather than a throwaway placeholder.
+
+Included:
+- Safe Area support for phone cutouts
+- player portrait / nickname / level block
+- health and armor bars with numeric values
+- food and water as icon + number only
+- thin EXP bar at the bottom center
+- live minimap rendered by a dedicated top-down camera
+- quest tracker
+- top navigation
+- mobile joystick
+- contextual action cluster
+- permanent Backpack and Craft buttons at the bottom-right
+- Backpack button opens the inventory/equipment screen
+- Craft button opens the crafting screen
+- no item quick-slot strip
 - no chat
 - no speaker
 - no prone
