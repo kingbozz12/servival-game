@@ -19,8 +19,18 @@ namespace SurvivalGame.Character
             RefreshSummary();
         }
 
-        public void SetMale() { profile.gender = CharacterGender.Male; RefreshSummary(); }
-        public void SetFemale() { profile.gender = CharacterGender.Female; RefreshSummary(); }
+        public void SetMale()
+        {
+            profile.gender = CharacterGender.Male;
+            RefreshSummary();
+        }
+
+        public void SetFemale()
+        {
+            profile.gender = CharacterGender.Female;
+            profile.hasBeard = false;
+            RefreshSummary();
+        }
 
         public void NextSkin()
         {
