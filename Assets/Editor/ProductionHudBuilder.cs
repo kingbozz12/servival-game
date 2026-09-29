@@ -20,6 +20,24 @@ namespace SurvivalGame.EditorTools
         private static Sprite circleSprite;
         private static Sprite ringSprite;
 
+        private static Sprite artPanel;
+        private static Sprite artCircleButton;
+        private static Sprite artSquareButton;
+        private static Sprite iconBackpack;
+        private static Sprite iconCraft;
+        private static Sprite iconInteract;
+        private static Sprite iconAim;
+        private static Sprite iconAxe;
+        private static Sprite iconHeart;
+        private static Sprite iconArmor;
+        private static Sprite iconFood;
+        private static Sprite iconWater;
+        private static Sprite iconShop;
+        private static Sprite iconBuild;
+        private static Sprite iconEvent;
+        private static Sprite iconCharacter;
+        private static Sprite iconMenu;
+
         private static readonly Color Panel = new Color(0.025f, 0.035f, 0.040f, 0.88f);
         private static readonly Color PanelSoft = new Color(0.035f, 0.050f, 0.055f, 0.78f);
         private static readonly Color Border = new Color(0.36f, 0.43f, 0.44f, 0.52f);
@@ -103,15 +121,15 @@ namespace SurvivalGame.EditorTools
             var level = CreateText(levelBadge, "Level", "1",
                 Vector2.zero, Vector2.one, 22, TextAnchor.MiddleCenter, TextPrimary);
 
-            CreateStatGlyph(panel, "Health Icon", StatGlyph.Heart,
-                new Vector2(0.205f, 0.48f), new Vector2(0.245f, 0.67f), Red);
+            CreateSpriteIcon(panel, "Health Icon", iconHeart,
+                new Vector2(0.205f, 0.48f), new Vector2(0.245f, 0.67f));
             var healthBar = CreateBar(panel, "Health",
                 new Vector2(0.255f, 0.50f), new Vector2(0.675f, 0.64f), Red);
             var healthText = CreateText(panel, "Health Value", "100 / 100",
                 new Vector2(0.69f, 0.45f), new Vector2(0.96f, 0.67f), 18, TextAnchor.MiddleLeft, TextPrimary);
 
-            CreateStatGlyph(panel, "Armor Icon", StatGlyph.Shield,
-                new Vector2(0.205f, 0.27f), new Vector2(0.245f, 0.45f), Armor);
+            CreateSpriteIcon(panel, "Armor Icon", iconArmor,
+                new Vector2(0.205f, 0.27f), new Vector2(0.245f, 0.45f));
             var armorBar = CreateBar(panel, "Armor",
                 new Vector2(0.255f, 0.29f), new Vector2(0.675f, 0.42f), Armor);
             var armorText = CreateText(panel, "Armor Value", "0 / 100",
@@ -119,15 +137,15 @@ namespace SurvivalGame.EditorTools
 
             var foodChip = CreatePanel(panel, "Food Chip",
                 new Vector2(0.205f, 0.035f), new Vector2(0.43f, 0.23f), PanelSoft, true);
-            CreateStatGlyph(foodChip, "Food Icon", StatGlyph.Food,
-                new Vector2(0.08f, 0.18f), new Vector2(0.30f, 0.82f), Warm);
+            CreateSpriteIcon(foodChip, "Food Icon", iconFood,
+                new Vector2(0.08f, 0.18f), new Vector2(0.30f, 0.82f));
             var foodText = CreateText(foodChip, "Food Value", "100",
                 new Vector2(0.35f, 0f), new Vector2(0.96f, 1f), 19, TextAnchor.MiddleLeft, TextPrimary);
 
             var waterChip = CreatePanel(panel, "Water Chip",
                 new Vector2(0.45f, 0.035f), new Vector2(0.675f, 0.23f), PanelSoft, true);
-            CreateStatGlyph(waterChip, "Water Icon", StatGlyph.Drop,
-                new Vector2(0.08f, 0.18f), new Vector2(0.30f, 0.82f), Cyan);
+            CreateSpriteIcon(waterChip, "Water Icon", iconWater,
+                new Vector2(0.08f, 0.18f), new Vector2(0.30f, 0.82f));
             var waterText = CreateText(waterChip, "Water Value", "100",
                 new Vector2(0.35f, 0f), new Vector2(0.96f, 1f), 19, TextAnchor.MiddleLeft, TextPrimary);
 
@@ -221,41 +239,19 @@ namespace SurvivalGame.EditorTools
 
         private static void DrawTopIcon(RectTransform root, TopIcon icon)
         {
-            var holder = CreateRect("Icon", root, new Vector2(0.22f, 0.34f), new Vector2(0.78f, 0.91f));
-
-            switch (icon)
+            Sprite sprite = icon switch
             {
-                case TopIcon.Shop:
-                    CreateCircle(holder, "Coin 1", new Vector2(0.20f, 0.18f), new Vector2(0.52f, 0.50f), Warm);
-                    CreateCircle(holder, "Coin 2", new Vector2(0.43f, 0.35f), new Vector2(0.75f, 0.67f), Warm);
-                    CreateCircle(holder, "Coin 3", new Vector2(0.24f, 0.53f), new Vector2(0.56f, 0.85f), Warm);
-                    break;
-                case TopIcon.Craft:
-                    CreateIconBar(holder, new Vector2(0.28f, 0.15f), new Vector2(0.40f, 0.86f), 42f);
-                    CreateIconBar(holder, new Vector2(0.60f, 0.15f), new Vector2(0.72f, 0.86f), -42f);
-                    break;
-                case TopIcon.Build:
-                    CreateIconBar(holder, new Vector2(0.24f, 0.43f), new Vector2(0.76f, 0.80f), 0f);
-                    CreateIconBar(holder, new Vector2(0.23f, 0.46f), new Vector2(0.53f, 0.58f), 42f);
-                    CreateIconBar(holder, new Vector2(0.47f, 0.46f), new Vector2(0.77f, 0.58f), -42f);
-                    CreatePanel(holder, "Door", new Vector2(0.44f, 0.43f), new Vector2(0.57f, 0.68f), Panel, false);
-                    break;
-                case TopIcon.Event:
-                    var calendar = CreatePanel(holder, "Calendar", new Vector2(0.22f, 0.20f), new Vector2(0.78f, 0.79f), TextPrimary, true);
-                    CreatePanel(calendar, "Cutout", new Vector2(0.10f, 0.30f), new Vector2(0.90f, 0.78f), Panel, true);
-                    CreatePanel(holder, "Tab L", new Vector2(0.31f, 0.72f), new Vector2(0.39f, 0.94f), TextPrimary, true);
-                    CreatePanel(holder, "Tab R", new Vector2(0.61f, 0.72f), new Vector2(0.69f, 0.94f), TextPrimary, true);
-                    break;
-                case TopIcon.Character:
-                    CreateCircle(holder, "Head", new Vector2(0.35f, 0.53f), new Vector2(0.65f, 0.84f), TextPrimary);
-                    CreatePanel(holder, "Body", new Vector2(0.27f, 0.16f), new Vector2(0.73f, 0.52f), TextPrimary, true);
-                    break;
-                case TopIcon.Menu:
-                    CreateIconBar(holder, new Vector2(0.20f, 0.66f), new Vector2(0.80f, 0.76f), 0f);
-                    CreateIconBar(holder, new Vector2(0.20f, 0.46f), new Vector2(0.80f, 0.56f), 0f);
-                    CreateIconBar(holder, new Vector2(0.20f, 0.26f), new Vector2(0.80f, 0.36f), 0f);
-                    break;
-            }
+                TopIcon.Shop => iconShop,
+                TopIcon.Build => iconBuild,
+                TopIcon.Event => iconEvent,
+                TopIcon.Character => iconCharacter,
+                TopIcon.Menu => iconMenu,
+                TopIcon.Craft => iconCraft,
+                _ => null
+            };
+
+            CreateSpriteIcon(root, "Icon", sprite,
+                new Vector2(0.24f, 0.34f), new Vector2(0.76f, 0.88f));
         }
 
         private static void BuildMinimap(RectTransform root, GameObject player)
@@ -350,15 +346,18 @@ namespace SurvivalGame.EditorTools
         {
             var interact = CreateActionButton(root, "Interact",
                 new Vector2(0.785f, 0.175f), new Vector2(0.855f, 0.300f), "ВЗЯТЬ", false);
-            DrawHandGlyph(interact);
+            CreateSpriteIcon(interact, "Interact Icon", iconInteract,
+                new Vector2(0.24f, 0.27f), new Vector2(0.76f, 0.79f));
 
             var aim = CreateActionButton(root, "Aim",
                 new Vector2(0.865f, 0.275f), new Vector2(0.930f, 0.390f), "", false);
-            DrawCrosshair(aim);
+            CreateSpriteIcon(aim, "Aim Icon", iconAim,
+                new Vector2(0.20f, 0.20f), new Vector2(0.80f, 0.80f));
 
             var main = CreateActionButton(root, "Context Action",
                 new Vector2(0.842f, 0.045f), new Vector2(0.947f, 0.235f), "ДЕЙСТВИЕ", true);
-            DrawToolGlyph(main);
+            CreateSpriteIcon(main, "Context Icon", iconAxe,
+                new Vector2(0.22f, 0.27f), new Vector2(0.78f, 0.83f));
         }
 
 
@@ -596,32 +595,23 @@ namespace SurvivalGame.EditorTools
         {
             var craft = CreateUtilityButton(root, "Craft Quick Button",
                 new Vector2(0.936f, 0.285f), new Vector2(0.988f, 0.378f), "КРАФТ");
-            DrawCraftGlyph(craft);
+            CreateSpriteIcon(craft, "Craft Icon", iconCraft,
+                new Vector2(0.22f, 0.25f), new Vector2(0.78f, 0.81f));
             UnityEventTools.AddPersistentListener(craft.GetComponent<Button>().onClick, screens.ToggleCrafting);
 
             var backpack = CreateUtilityButton(root, "Backpack Quick Button",
                 new Vector2(0.936f, 0.180f), new Vector2(0.988f, 0.273f), "РЮКЗАК");
-            DrawBackpackGlyph(backpack);
+            CreateSpriteIcon(backpack, "Backpack Icon", iconBackpack,
+                new Vector2(0.22f, 0.25f), new Vector2(0.78f, 0.81f));
             UnityEventTools.AddPersistentListener(backpack.GetComponent<Button>().onClick, screens.ToggleInventory);
         }
 
         private static RectTransform CreateUtilityButton(RectTransform root, string name, Vector2 min, Vector2 max, string label)
         {
-            var frame = CreateCircle(root, name + " Frame", min, max,
-                new Color(0.54f, 0.61f, 0.62f, 0.72f));
-            var buttonRoot = CreateCircle(frame, name,
-                new Vector2(0.045f, 0.045f), new Vector2(0.955f, 0.955f),
-                new Color(0.025f, 0.037f, 0.042f, 0.96f));
-
-            var image = buttonRoot.GetComponent<Image>();
-            image.raycastTarget = true;
-
-            var button = buttonRoot.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            buttonRoot.gameObject.AddComponent<HudTopButton>();
+            var buttonRoot = CreateArtButton(root, name, min, max, artCircleButton);
 
             CreateText(buttonRoot, "Label", label,
-                new Vector2(0.05f, 0.02f), new Vector2(0.95f, 0.22f),
+                new Vector2(0.05f, 0.01f), new Vector2(0.95f, 0.22f),
                 10, TextAnchor.MiddleCenter, TextMuted);
 
             return buttonRoot;
@@ -650,20 +640,11 @@ namespace SurvivalGame.EditorTools
 
         private static RectTransform CreateActionButton(RectTransform root, string name, Vector2 min, Vector2 max, string label, bool primary)
         {
-            var frame = CreateCircle(root, name + " Frame", min, max,
-                primary ? new Color(0.72f, 0.79f, 0.80f, 0.88f) : new Color(0.55f, 0.61f, 0.62f, 0.70f));
-            var buttonRoot = CreateCircle(frame, name,
-                new Vector2(0.035f, 0.035f), new Vector2(0.965f, 0.965f),
-                new Color(0.025f, 0.035f, 0.040f, primary ? 0.97f : 0.91f));
-
-            var button = buttonRoot.gameObject.AddComponent<Button>();
-            buttonRoot.GetComponent<Image>().raycastTarget = true;
-            button.targetGraphic = buttonRoot.GetComponent<Image>();
-            buttonRoot.gameObject.AddComponent<HudTopButton>();
+            var buttonRoot = CreateArtButton(root, name, min, max, artCircleButton);
 
             if (!string.IsNullOrEmpty(label))
                 CreateText(buttonRoot, "Label", label,
-                    new Vector2(0.08f, 0.02f), new Vector2(0.92f, 0.25f),
+                    new Vector2(0.08f, 0.01f), new Vector2(0.92f, 0.24f),
                     primary ? 12 : 11, TextAnchor.MiddleCenter, TextMuted);
 
             return buttonRoot;
