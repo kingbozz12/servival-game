@@ -352,7 +352,7 @@ namespace SurvivalGame.EditorTools
             var mainIcon = CreateSpriteIcon(main, "Context Icon", iconAxe,
                 new Vector2(0.22f, 0.27f), new Vector2(0.78f, 0.83f));
 
-            var actionPresenter = main.gameObject.AddComponent<PlayerActionButtonPresenter>();
+            var actionPresenter = root.gameObject.AddComponent<PlayerActionButtonPresenter>();
             var actionLabel = main.Find("Label") ? main.Find("Label").GetComponent<Text>() : null;
             actionPresenter.Configure(
                 player.GetComponent<PlayerActionButtonState>(),
