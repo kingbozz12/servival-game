@@ -1,11 +1,13 @@
 #if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using SurvivalGame.Player;
+using SurvivalGame.Inventory;
 using SurvivalGame.UI;
 
 namespace SurvivalGame.EditorTools
@@ -47,7 +49,8 @@ namespace SurvivalGame.EditorTools
             BuildMinimap(safe, player);
             BuildJoystick(safe, player);
             BuildActionCluster(safe);
-            BuildBottomUtilityButtons(safe);
+            var screens = BuildOverlayScreens(safe, player);
+            BuildBottomUtilityButtons(safe, screens);
             BuildExpBar(safe, player);
         }
 
@@ -359,15 +362,247 @@ namespace SurvivalGame.EditorTools
         }
 
 
-        private static void BuildBottomUtilityButtons(RectTransform root)
+
+        private static HudScreenController BuildOverlayScreens(RectTransform root, GameObject player)
+        {
+            var controller = root.gameObject.AddComponent<HudScreenController>();
+            var inventory = BuildInventoryScreen(root, player, controller);
+            var crafting = BuildCraftingScreen(root, controller);
+            controller.Configure(inventory.gameObject, crafting.gameObject);
+            return controller;
+        }
+
+        private static RectTransform BuildInventoryScreen(RectTransform root, GameObject player, HudScreenController controller)
+        {
+            var dim = CreatePanel(root, "Inventory Dim",
+                Vector2.zero, Vector2.one, new Color(0f, 0f, 0f, 0.70f), false);
+
+            var panel = CreateFramedPanel(dim, "Inventory Screen",
+                new Vector2(0.13f, 0.10f), new Vector2(0.87f, 0.91f),
+                new Color(0.025f, 0.035f, 0.040f, 0.985f));
+
+            CreateText(panel, "Title", "РЮКЗАК",
+                new Vector2(0.035f, 0.905f), new Vector2(0.30f, 0.975f),
+                30, TextAnchor.MiddleLeft, TextPrimary);
+
+            var close = CreatePanel(panel, "Close",
+                new Vector2(0.935f, 0.915f), new Vector2(0.982f, 0.970f),
+                new Color(0.10f, 0.13f, 0.14f, 1f), true);
+            close.GetComponent<Image>().raycastTarget = true;
+            var closeButton = close.gameObject.AddComponent<Button>();
+            closeButton.targetGraphic = close.GetComponent<Image>();
+            close.gameObject.AddComponent<HudTopButton>();
+            CreateText(close, "X", "×", Vector2.zero, Vector2.one, 26, TextAnchor.MiddleCenter, TextPrimary);
+            UnityEventTools.AddPersistentListener(closeButton.onClick, controller.CloseAll);
+
+            var categories = CreateFramedPanel(panel, "Categories",
+                new Vector2(0.025f, 0.08f), new Vector2(0.18f, 0.875f), PanelSoft);
+            CreateText(categories, "Header", "КАТЕГОРИИ",
+                new Vector2(0.10f, 0.91f), new Vector2(0.90f, 0.98f),
+                15, TextAnchor.MiddleLeft, TextMuted);
+
+            string[] categoryLabels = { "ВСЁ", "ОРУЖИЕ", "ЕДА", "МЕДИЦИНА", "РЕСУРСЫ", "ОДЕЖДА", "ПРОЧЕЕ" };
+            for (int i = 0; i < categoryLabels.Length; i++)
+            {
+                float top = 0.84f - i * 0.11f;
+                var cat = CreatePanel(categories, "Category " + categoryLabels[i],
+                    new Vector2(0.08f, top - 0.075f), new Vector2(0.92f, top),
+                    i == 0 ? new Color(0.05f, 0.31f, 0.36f, 0.95f) : new Color(0.04f, 0.055f, 0.06f, 0.85f), true);
+                cat.GetComponent<Image>().raycastTarget = true;
+                var b = cat.gameObject.AddComponent<Button>();
+                b.targetGraphic = cat.GetComponent<Image>();
+                cat.gameObject.AddComponent<HudTopButton>();
+                CreateText(cat, "Label", categoryLabels[i], new Vector2(0.06f, 0f), new Vector2(0.94f, 1f),
+                    15, TextAnchor.MiddleLeft, i == 0 ? TextPrimary : TextMuted);
+            }
+
+            var center = CreateFramedPanel(panel, "Inventory Grid Panel",
+                new Vector2(0.195f, 0.08f), new Vector2(0.68f, 0.875f), PanelSoft);
+
+            var weightText = CreateText(center, "Weight", "0.0 / 60.0 кг",
+                new Vector2(0.04f, 0.91f), new Vector2(0.34f, 0.98f),
+                16, TextAnchor.MiddleLeft, TextPrimary);
+            var slotsText = CreateText(center, "Slots", "0 / 20",
+                new Vector2(0.36f, 0.91f), new Vector2(0.53f, 0.98f),
+                16, TextAnchor.MiddleLeft, TextMuted);
+
+            var sort = CreatePanel(center, "Sort",
+                new Vector2(0.74f, 0.905f), new Vector2(0.96f, 0.975f),
+                new Color(0.05f, 0.31f, 0.36f, 0.95f), true);
+            sort.GetComponent<Image>().raycastTarget = true;
+            var sortButton = sort.gameObject.AddComponent<Button>();
+            sortButton.targetGraphic = sort.GetComponent<Image>();
+            sort.gameObject.AddComponent<HudTopButton>();
+            CreateText(sort, "Label", "СОРТИРОВАТЬ", Vector2.zero, Vector2.one,
+                13, TextAnchor.MiddleCenter, TextPrimary);
+
+            var grid = CreateRect("Slots Grid", center, new Vector2(0.035f, 0.055f), new Vector2(0.965f, 0.875f));
+            int columns = 5;
+            int rows = 4;
+            float cellW = 0.18f;
+            float cellH = 0.22f;
+            float gapX = 0.018f;
+            float gapY = 0.025f;
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < columns; col++)
+                {
+                    int index = row * columns + col;
+                    float x0 = col * (cellW + gapX);
+                    float y1 = 1f - row * (cellH + gapY);
+                    float y0 = y1 - cellH;
+
+                    var slot = CreatePanel(grid, $"Inventory Slot {index + 1}",
+                        new Vector2(x0, y0), new Vector2(x0 + cellW, y1),
+                        new Color(0.035f, 0.047f, 0.052f, 0.96f), true);
+                    AddOutline(slot, new Color(0.22f, 0.28f, 0.29f, 0.85f), 1f);
+
+                    var icon = slot.gameObject.AddComponent<InventorySlotView>();
+                    var itemIconRt = CreateRect("Icon", slot, new Vector2(0.12f, 0.17f), new Vector2(0.88f, 0.88f));
+                    var itemIcon = itemIconRt.gameObject.AddComponent<Image>();
+                    itemIcon.preserveAspect = true;
+                    itemIcon.enabled = false;
+                    itemIcon.raycastTarget = false;
+
+                    var fallback = CreateText(slot, "Fallback", "",
+                        new Vector2(0.08f, 0.20f), new Vector2(0.92f, 0.82f),
+                        14, TextAnchor.MiddleCenter, TextMuted);
+                    var amount = CreateText(slot, "Amount", "",
+                        new Vector2(0.60f, 0.02f), new Vector2(0.94f, 0.28f),
+                        14, TextAnchor.MiddleRight, TextPrimary);
+                    icon.Configure(itemIcon, amount, fallback);
+                }
+            }
+
+            var right = CreateFramedPanel(panel, "Equipment",
+                new Vector2(0.695f, 0.08f), new Vector2(0.975f, 0.875f), PanelSoft);
+            CreateText(right, "Header", "ЭКИПИРОВКА",
+                new Vector2(0.08f, 0.91f), new Vector2(0.92f, 0.98f),
+                16, TextAnchor.MiddleCenter, TextMuted);
+
+            var body = CreatePanel(right, "Character Preview",
+                new Vector2(0.24f, 0.20f), new Vector2(0.76f, 0.84f),
+                new Color(0.03f, 0.045f, 0.050f, 1f), true);
+            CreateCircle(body, "Head", new Vector2(0.40f, 0.72f), new Vector2(0.60f, 0.88f), TextMuted);
+            CreatePanel(body, "Body", new Vector2(0.35f, 0.35f), new Vector2(0.65f, 0.72f), TextMuted, true);
+            CreateIconBar(body, new Vector2(0.26f, 0.34f), new Vector2(0.38f, 0.68f), -12f);
+            CreateIconBar(body, new Vector2(0.62f, 0.34f), new Vector2(0.74f, 0.68f), 12f);
+            CreateIconBar(body, new Vector2(0.38f, 0.08f), new Vector2(0.48f, 0.38f), 3f);
+            CreateIconBar(body, new Vector2(0.52f, 0.08f), new Vector2(0.62f, 0.38f), -3f);
+
+            string[] equipment = { "ГОЛОВА", "КУРТКА", "ТОРС", "ПЕРЧАТКИ", "НОГИ", "ОБУВЬ", "РЮКЗАК", "ОРУЖИЕ" };
+            for (int i = 0; i < equipment.Length; i++)
+            {
+                bool left = i < 4;
+                int local = left ? i : i - 4;
+                float y = 0.72f - local * 0.16f;
+                float x0 = left ? 0.03f : 0.78f;
+                float x1 = left ? 0.21f : 0.97f;
+
+                var equip = CreatePanel(right, equipment[i],
+                    new Vector2(x0, y), new Vector2(x1, y + 0.12f),
+                    new Color(0.035f, 0.047f, 0.052f, 0.98f), true);
+                AddOutline(equip, new Color(0.22f, 0.28f, 0.29f, 0.80f), 1f);
+                CreateText(equip, "Label", equipment[i],
+                    new Vector2(0.03f, 0f), new Vector2(0.97f, 1f),
+                    10, TextAnchor.MiddleCenter, TextMuted);
+            }
+
+            var presenter = panel.gameObject.AddComponent<InventoryScreenPresenter>();
+            presenter.Configure(player.GetComponent<InventoryContainer>(), weightText, slotsText);
+            UnityEventTools.AddPersistentListener(sortButton.onClick, presenter.Sort);
+
+            return dim;
+        }
+
+        private static RectTransform BuildCraftingScreen(RectTransform root, HudScreenController controller)
+        {
+            var dim = CreatePanel(root, "Crafting Dim",
+                Vector2.zero, Vector2.one, new Color(0f, 0f, 0f, 0.70f), false);
+
+            var panel = CreateFramedPanel(dim, "Crafting Screen",
+                new Vector2(0.15f, 0.11f), new Vector2(0.85f, 0.90f),
+                new Color(0.025f, 0.035f, 0.040f, 0.985f));
+
+            CreateText(panel, "Title", "КРАФТ",
+                new Vector2(0.04f, 0.905f), new Vector2(0.30f, 0.975f),
+                30, TextAnchor.MiddleLeft, TextPrimary);
+
+            var close = CreatePanel(panel, "Close",
+                new Vector2(0.935f, 0.915f), new Vector2(0.982f, 0.970f),
+                new Color(0.10f, 0.13f, 0.14f, 1f), true);
+            close.GetComponent<Image>().raycastTarget = true;
+            var closeButton = close.gameObject.AddComponent<Button>();
+            closeButton.targetGraphic = close.GetComponent<Image>();
+            close.gameObject.AddComponent<HudTopButton>();
+            CreateText(close, "X", "×", Vector2.zero, Vector2.one, 26, TextAnchor.MiddleCenter, TextPrimary);
+            UnityEventTools.AddPersistentListener(closeButton.onClick, controller.CloseAll);
+
+            var categories = CreateFramedPanel(panel, "Craft Categories",
+                new Vector2(0.025f, 0.08f), new Vector2(0.21f, 0.875f), PanelSoft);
+            CreateText(categories, "Header", "РАЗДЕЛЫ",
+                new Vector2(0.10f, 0.91f), new Vector2(0.90f, 0.98f),
+                15, TextAnchor.MiddleLeft, TextMuted);
+
+            string[] labels = { "БАЗОВОЕ", "ИНСТРУМЕНТЫ", "ОРУЖИЕ", "ОДЕЖДА", "СТРОЙКА", "ЕДА" };
+            for (int i = 0; i < labels.Length; i++)
+            {
+                float top = 0.84f - i * 0.12f;
+                var row = CreatePanel(categories, labels[i],
+                    new Vector2(0.08f, top - 0.08f), new Vector2(0.92f, top),
+                    i == 0 ? new Color(0.05f, 0.31f, 0.36f, 0.95f) : new Color(0.04f, 0.055f, 0.06f, 0.85f), true);
+                CreateText(row, "Label", labels[i], new Vector2(0.05f, 0f), new Vector2(0.95f, 1f),
+                    15, TextAnchor.MiddleLeft, i == 0 ? TextPrimary : TextMuted);
+            }
+
+            var recipes = CreateFramedPanel(panel, "Recipes",
+                new Vector2(0.225f, 0.08f), new Vector2(0.62f, 0.875f), PanelSoft);
+            CreateText(recipes, "Header", "РЕЦЕПТЫ",
+                new Vector2(0.06f, 0.91f), new Vector2(0.94f, 0.98f),
+                16, TextAnchor.MiddleLeft, TextMuted);
+
+            CreateText(recipes, "Empty State",
+                "Доступные рецепты появятся здесь после того, как мы утвердим предметы и стоимость крафта.",
+                new Vector2(0.10f, 0.35f), new Vector2(0.90f, 0.62f),
+                18, TextAnchor.MiddleCenter, TextMuted);
+
+            var details = CreateFramedPanel(panel, "Recipe Details",
+                new Vector2(0.635f, 0.08f), new Vector2(0.975f, 0.875f), PanelSoft);
+            CreateText(details, "Header", "ПРЕДМЕТ",
+                new Vector2(0.08f, 0.91f), new Vector2(0.92f, 0.98f),
+                16, TextAnchor.MiddleLeft, TextMuted);
+
+            var preview = CreatePanel(details, "Preview",
+                new Vector2(0.20f, 0.51f), new Vector2(0.80f, 0.84f),
+                new Color(0.035f, 0.047f, 0.052f, 0.98f), true);
+            AddOutline(preview, new Color(0.22f, 0.28f, 0.29f, 0.80f), 1f);
+
+            CreateText(details, "Info",
+                "Выбери рецепт слева. Здесь будут характеристики, необходимые ресурсы и кнопка создания.",
+                new Vector2(0.10f, 0.26f), new Vector2(0.90f, 0.48f),
+                16, TextAnchor.UpperLeft, TextMuted);
+
+            var craftButton = CreatePanel(details, "Craft Button",
+                new Vector2(0.18f, 0.08f), new Vector2(0.82f, 0.18f),
+                CyanDim, true);
+            CreateText(craftButton, "Label", "СОЗДАТЬ",
+                Vector2.zero, Vector2.one, 18, TextAnchor.MiddleCenter, TextPrimary);
+
+            return dim;
+        }
+
+        private static void BuildBottomUtilityButtons(RectTransform root, HudScreenController screens)
         {
             var craft = CreateUtilityButton(root, "Craft Quick Button",
                 new Vector2(0.936f, 0.285f), new Vector2(0.988f, 0.378f), "КРАФТ");
             DrawCraftGlyph(craft);
+            UnityEventTools.AddPersistentListener(craft.GetComponent<Button>().onClick, screens.ToggleCrafting);
 
             var backpack = CreateUtilityButton(root, "Backpack Quick Button",
                 new Vector2(0.936f, 0.180f), new Vector2(0.988f, 0.273f), "РЮКЗАК");
             DrawBackpackGlyph(backpack);
+            UnityEventTools.AddPersistentListener(backpack.GetComponent<Button>().onClick, screens.ToggleInventory);
         }
 
         private static RectTransform CreateUtilityButton(RectTransform root, string name, Vector2 min, Vector2 max, string label)
