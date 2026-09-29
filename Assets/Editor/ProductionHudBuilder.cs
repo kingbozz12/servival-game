@@ -231,13 +231,24 @@ namespace SurvivalGame.EditorTools
                 float x0 = start + i * (width + gap);
                 float x1 = x0 + width;
 
-                var buttonRoot = CreateArtButton(root, labels[i],
-                    new Vector2(x0, 0.892f), new Vector2(x1, 0.985f), artSquareButton);
+                Sprite approved = icons[i] switch
+                {
+                    TopIcon.Build => approvedBuildButton,
+                    TopIcon.Menu => approvedMenuButton,
+                    _ => null
+                };
 
-                DrawTopIcon(buttonRoot, icons[i]);
-                CreateText(buttonRoot, "Label", labels[i],
-                    new Vector2(0.02f, 0.03f), new Vector2(0.98f, 0.31f),
-                    12, TextAnchor.MiddleCenter, TextPrimary);
+                var buttonRoot = CreateArtButton(root, labels[i],
+                    new Vector2(x0, 0.892f), new Vector2(x1, 0.985f),
+                    approved ? approved : artSquareButton);
+
+                if (!approved)
+                {
+                    DrawTopIcon(buttonRoot, icons[i]);
+                    CreateText(buttonRoot, "Label", labels[i],
+                        new Vector2(0.02f, 0.03f), new Vector2(0.98f, 0.31f),
+                        12, TextAnchor.MiddleCenter, TextPrimary);
+                }
             }
         }
 
@@ -885,7 +896,6 @@ namespace SurvivalGame.EditorTools
             Directory.CreateDirectory(diskFolder);
 
             ProductionUiArtGenerator.Ensure();
-            CleanApprovedButtonGenerator.GenerateAll(force: true);
 
             approvedActionButton = LoadApprovedButton("action");
             approvedAimButton = LoadApprovedButton("aim");
