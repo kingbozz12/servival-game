@@ -22,7 +22,7 @@ namespace SurvivalGame.EditorTools
     {
         private const string GeneratedFolder = "Assets/Generated";
         private const string ScenesFolder = "Assets/Scenes";
-        private const string Marker = GeneratedFolder + "/ProductionUI_v2.marker";
+        private const string Marker = GeneratedFolder + "/ProductionUI_v3.marker";
 
         static PrototypeAutoBuilder()
         {
