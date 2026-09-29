@@ -7,10 +7,14 @@ namespace SurvivalGame.UI
     {
         [SerializeField] private PlayerActionButtonState state;
         [SerializeField] private GameObject visualRoot;
+        [SerializeField] private Image background;
         [SerializeField] private Image icon;
         [SerializeField] private Text label;
-        [SerializeField] private Sprite fallbackGatherIcon;
-        [SerializeField] private Sprite fallbackAttackIcon;
+
+        [Header("Approved button art")]
+        [SerializeField] private Sprite neutralBackground;
+        [SerializeField] private Sprite gatherFallbackButton;
+        [SerializeField] private Sprite attackFallbackButton;
 
         private PlayerActionButtonMode lastMode = (PlayerActionButtonMode)(-1);
         private Sprite lastIcon;
@@ -18,17 +22,21 @@ namespace SurvivalGame.UI
         public void Configure(
             PlayerActionButtonState actionState,
             GameObject root,
+            Image backgroundImage,
             Image iconImage,
             Text labelText,
+            Sprite neutral,
             Sprite gatherFallback,
             Sprite attackFallback)
         {
             state = actionState;
             visualRoot = root;
+            background = backgroundImage;
             icon = iconImage;
             label = labelText;
-            fallbackGatherIcon = gatherFallback;
-            fallbackAttackIcon = attackFallback;
+            neutralBackground = neutral;
+            gatherFallbackButton = gatherFallback;
+            attackFallbackButton = attackFallback;
             Refresh(true);
         }
 
@@ -59,15 +67,32 @@ namespace SurvivalGame.UI
             if (mode == PlayerActionButtonMode.Hidden)
                 return;
 
-            if (icon)
+            if (currentIcon)
             {
-                icon.sprite = currentIcon
-                    ? currentIcon
-                    : mode == PlayerActionButtonMode.Gather
-                        ? fallbackGatherIcon
-                        : fallbackAttackIcon;
+                if (background && neutralBackground)
+                    background.sprite = neutralBackground;
 
-                icon.enabled = icon.sprite;
+                if (icon)
+                {
+                    icon.gameObject.SetActive(true);
+                    icon.enabled = true;
+                    icon.sprite = currentIcon;
+                }
+            }
+            else
+            {
+                if (background)
+                {
+                    background.sprite = mode == PlayerActionButtonMode.Gather
+                        ? gatherFallbackButton
+                        : attackFallbackButton;
+                }
+
+                if (icon)
+                {
+                    icon.enabled = false;
+                    icon.gameObject.SetActive(false);
+                }
             }
 
             if (label)

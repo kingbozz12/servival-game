@@ -102,3 +102,22 @@ Visual theme:
 - restrained cyan accent
 - high-contrast readable icons
 - designed for top-down/isometric mobile gameplay
+
+
+## Approved translucent button assets
+The latest approved circular button artwork is stored as real PNG files in:
+`Assets/UI/Approved/Buttons`
+
+Approved set:
+- action
+- aim
+- axe/context fallback
+- backpack
+- craft
+- build
+- menu
+- map
+- neutral chrome for dynamic item icons
+
+These PNGs are intentionally semi-transparent in the dark face while keeping the metallic rim and white pictograms readable.
+Gameplay HUD uses the approved action, aim, backpack and craft PNGs directly. The context action uses the approved chrome when a real equipped item icon is available.

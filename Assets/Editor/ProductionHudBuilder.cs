@@ -23,6 +23,17 @@ namespace SurvivalGame.EditorTools
         private static Sprite artPanel;
         private static Sprite artCircleButton;
         private static Sprite artSquareButton;
+
+        private static Sprite approvedActionButton;
+        private static Sprite approvedAimButton;
+        private static Sprite approvedAxeButton;
+        private static Sprite approvedBackpackButton;
+        private static Sprite approvedCraftButton;
+        private static Sprite approvedBuildButton;
+        private static Sprite approvedMenuButton;
+        private static Sprite approvedMapButton;
+        private static Sprite approvedChromeButton;
+
         private static Sprite iconBackpack;
         private static Sprite iconCraft;
         private static Sprite iconInteract;
@@ -337,34 +348,34 @@ namespace SurvivalGame.EditorTools
 
         private static void BuildActionCluster(RectTransform root, GameObject player)
         {
-            var interact = CreateActionButton(root, "Interact",
-                new Vector2(0.785f, 0.175f), new Vector2(0.855f, 0.300f), "ВЗЯТЬ", false);
-            CreateSpriteIcon(interact, "Interact Icon", iconInteract,
-                new Vector2(0.24f, 0.27f), new Vector2(0.76f, 0.79f));
+            var interact = CreateArtButton(root, "Interact",
+                new Vector2(0.785f, 0.175f), new Vector2(0.855f, 0.300f), approvedActionButton);
 
-            var aim = CreateActionButton(root, "Aim",
-                new Vector2(0.865f, 0.275f), new Vector2(0.930f, 0.390f), "", false);
-            CreateSpriteIcon(aim, "Aim Icon", iconAim,
-                new Vector2(0.20f, 0.20f), new Vector2(0.80f, 0.80f));
+            var aim = CreateArtButton(root, "Aim",
+                new Vector2(0.865f, 0.275f), new Vector2(0.930f, 0.390f), approvedAimButton);
 
-            var main = CreateActionButton(root, "Context Action",
-                new Vector2(0.842f, 0.045f), new Vector2(0.947f, 0.235f), "ДЕЙСТВИЕ", true);
-            var mainIcon = CreateSpriteIcon(main, "Context Icon", iconAxe,
-                new Vector2(0.22f, 0.27f), new Vector2(0.78f, 0.83f));
+            var main = CreateArtButton(root, "Context Action",
+                new Vector2(0.842f, 0.045f), new Vector2(0.947f, 0.235f), approvedAxeButton);
+            Text actionLabel = null;
+
+            var dynamicIcon = CreateSpriteIcon(main, "Dynamic Context Icon", null,
+                new Vector2(0.24f, 0.24f), new Vector2(0.76f, 0.76f));
+            dynamicIcon.enabled = false;
+            dynamicIcon.gameObject.SetActive(false);
 
             var actionPresenter = root.gameObject.AddComponent<PlayerActionButtonPresenter>();
-            var actionLabel = main.Find("Label") ? main.Find("Label").GetComponent<Text>() : null;
             actionPresenter.Configure(
                 player.GetComponent<PlayerActionButtonState>(),
                 main.gameObject,
-                mainIcon,
+                main.GetComponent<Image>(),
+                dynamicIcon,
                 actionLabel,
-                iconAxe,
-                iconAxe);
+                approvedChromeButton,
+                approvedAxeButton,
+                approvedActionButton);
+
             UnityEventTools.AddPersistentListener(main.GetComponent<Button>().onClick, actionPresenter.Press);
         }
-
-
 
         private static HudScreenController BuildOverlayScreens(RectTransform root, GameObject player)
         {
@@ -597,16 +608,12 @@ namespace SurvivalGame.EditorTools
 
         private static void BuildBottomUtilityButtons(RectTransform root, HudScreenController screens)
         {
-            var craft = CreateUtilityButton(root, "Craft Quick Button",
-                new Vector2(0.936f, 0.285f), new Vector2(0.988f, 0.378f), "КРАФТ");
-            CreateSpriteIcon(craft, "Craft Icon", iconCraft,
-                new Vector2(0.22f, 0.25f), new Vector2(0.78f, 0.81f));
+            var craft = CreateArtButton(root, "Craft Quick Button",
+                new Vector2(0.936f, 0.285f), new Vector2(0.988f, 0.378f), approvedCraftButton);
             UnityEventTools.AddPersistentListener(craft.GetComponent<Button>().onClick, screens.ToggleCrafting);
 
-            var backpack = CreateUtilityButton(root, "Backpack Quick Button",
-                new Vector2(0.936f, 0.180f), new Vector2(0.988f, 0.273f), "РЮКЗАК");
-            CreateSpriteIcon(backpack, "Backpack Icon", iconBackpack,
-                new Vector2(0.22f, 0.25f), new Vector2(0.78f, 0.81f));
+            var backpack = CreateArtButton(root, "Backpack Quick Button",
+                new Vector2(0.936f, 0.180f), new Vector2(0.988f, 0.273f), approvedBackpackButton);
             UnityEventTools.AddPersistentListener(backpack.GetComponent<Button>().onClick, screens.ToggleInventory);
         }
 
@@ -879,6 +886,16 @@ namespace SurvivalGame.EditorTools
 
             ProductionUiArtGenerator.Ensure();
 
+            approvedActionButton = LoadApprovedButton("action");
+            approvedAimButton = LoadApprovedButton("aim");
+            approvedAxeButton = LoadApprovedButton("axe");
+            approvedBackpackButton = LoadApprovedButton("backpack");
+            approvedCraftButton = LoadApprovedButton("craft");
+            approvedBuildButton = LoadApprovedButton("build");
+            approvedMenuButton = LoadApprovedButton("menu");
+            approvedMapButton = LoadApprovedButton("map");
+            approvedChromeButton = LoadApprovedButton("chrome");
+
             artPanel = ProductionUiArtGenerator.Load("ui_panel");
             artCircleButton = ProductionUiArtGenerator.Load("ui_button_circle");
             artSquareButton = ProductionUiArtGenerator.Load("ui_button_square");
@@ -901,6 +918,26 @@ namespace SurvivalGame.EditorTools
             roundedSprite = artPanel ? artPanel : EnsureSprite("rounded_panel", 64, 64, true, false);
             circleSprite = EnsureSprite("circle", 128, 128, false, false);
             ringSprite = EnsureSprite("ring", 128, 128, false, true);
+        }
+
+        private static Sprite LoadApprovedButton(string name)
+        {
+            string path = $"Assets/UI/Approved/Buttons/{name}.png";
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+
+            if (importer != null && importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = false;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.textureCompression = TextureImporterCompression.CompressedHQ;
+                importer.maxTextureSize = 256;
+                importer.SaveAndReimport();
+            }
+
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
         private static Sprite EnsureSprite(string name, int width, int height, bool rounded, bool ring)
