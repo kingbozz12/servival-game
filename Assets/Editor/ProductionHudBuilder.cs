@@ -350,18 +350,13 @@ namespace SurvivalGame.EditorTools
         {
             var interact = CreateArtButton(root, "Interact",
                 new Vector2(0.785f, 0.175f), new Vector2(0.855f, 0.300f), approvedActionButton);
-            CreateText(interact, "Label", "ВЗЯТЬ",
-                new Vector2(0.08f, 0.00f), new Vector2(0.92f, 0.20f),
-                11, TextAnchor.MiddleCenter, TextMuted);
 
             var aim = CreateArtButton(root, "Aim",
                 new Vector2(0.865f, 0.275f), new Vector2(0.930f, 0.390f), approvedAimButton);
 
             var main = CreateArtButton(root, "Context Action",
                 new Vector2(0.842f, 0.045f), new Vector2(0.947f, 0.235f), approvedAxeButton);
-            var actionLabel = CreateText(main, "Label", "ДЕЙСТВИЕ",
-                new Vector2(0.08f, 0.00f), new Vector2(0.92f, 0.20f),
-                12, TextAnchor.MiddleCenter, TextMuted);
+            Text actionLabel = null;
 
             var dynamicIcon = CreateSpriteIcon(main, "Dynamic Context Icon", null,
                 new Vector2(0.24f, 0.24f), new Vector2(0.76f, 0.76f));
