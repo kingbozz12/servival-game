@@ -93,9 +93,9 @@ namespace SurvivalGame.EditorTools
         {
             var c = new Raster(128, 128);
             c.RoundedRect(new Rect(5, 8, 118, 116), 20, new Color(0, 0, 0, 0.40f));
-            c.RoundedRect(new Rect(3, 3, 122, 122), 20, new Color(0.075f, 0.095f, 0.105f, 0.98f));
-            c.RoundedRing(new Rect(3, 3, 122, 122), 20, 2.2f, new Color(0.50f, 0.57f, 0.58f, 0.70f));
-            c.RoundedRing(new Rect(8, 8, 112, 112), 16, 1.2f, new Color(0.08f, 0.57f, 0.64f, 0.25f));
+            c.RoundedRect(new Rect(3, 3, 122, 122), 20, new Color(0.88f, 0.91f, 0.92f, 0.98f));
+            c.RoundedRing(new Rect(3, 3, 122, 122), 20, 2.2f, new Color(0.98f, 0.99f, 1.00f, 0.82f));
+            c.RoundedRing(new Rect(8, 8, 112, 112), 16, 1.2f, new Color(0.14f, 0.76f, 0.84f, 0.38f));
             c.Line(new Vector2(18, 15), new Vector2(110, 15), 1.3f, new Color(1, 1, 1, 0.12f));
             return c.ToTexture();
         }
