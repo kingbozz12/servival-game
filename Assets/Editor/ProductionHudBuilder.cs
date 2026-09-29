@@ -204,6 +204,7 @@ namespace SurvivalGame.EditorTools
                 AddOutline(buttonRoot, Border, 1f);
 
                 var button = buttonRoot.gameObject.AddComponent<Button>();
+                buttonRoot.GetComponent<Image>().raycastTarget = true;
                 button.targetGraphic = buttonRoot.GetComponent<Image>();
                 buttonRoot.gameObject.AddComponent<HudTopButton>();
 
@@ -334,6 +335,7 @@ namespace SurvivalGame.EditorTools
             CreateDirectionTick(outer, "W", new Vector2(0.06f, 0.47f), new Vector2(0.15f, 0.53f), 90f);
             CreateDirectionTick(outer, "E", new Vector2(0.85f, 0.47f), new Vector2(0.94f, 0.53f), -90f);
 
+            outer.GetComponent<Image>().raycastTarget = true;
             var joystick = outer.gameObject.AddComponent<VirtualJoystick>();
             joystick.Bind(player.GetComponent<MobileRunController>());
             BindObject(joystick, "background", outer);
