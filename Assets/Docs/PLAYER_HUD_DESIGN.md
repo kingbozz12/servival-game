@@ -67,3 +67,38 @@ Example:
 This is our own HUD direction. It may use familiar survival-game conventions, but layout, icon treatment, spacing, typography and final art should remain original.
 
 The current mockup is a working design reference, not a final pixel-perfect layout. It will be refined later after the real scene, character, animations and device testing are in place.
+
+
+## Production UI art v3
+The gameplay HUD is no longer intended to use placeholder geometric glyphs as its final presentation layer.
+
+Unity now generates and imports dedicated production UI sprites under:
+`Assets/Generated/UI/Art`
+
+Current generated art includes:
+- 9-slice survival panel
+- circular action button
+- square navigation button
+- backpack
+- crafting
+- interaction hand
+- aiming reticle
+- axe/context action fallback
+- health
+- armor
+- food
+- water
+- shop
+- building
+- events
+- character
+- menu
+
+The HUD builder uses these sprites directly. Context action icons still prefer the icon from the actual equipped item when available.
+
+Visual theme:
+- dark graphite surfaces
+- cold metallic borders
+- restrained cyan accent
+- high-contrast readable icons
+- designed for top-down/isometric mobile gameplay
