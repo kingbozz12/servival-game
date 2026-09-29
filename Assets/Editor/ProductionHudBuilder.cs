@@ -220,15 +220,8 @@ namespace SurvivalGame.EditorTools
                 float x0 = start + i * (width + gap);
                 float x1 = x0 + width;
 
-                var buttonRoot = CreatePanel(root, labels[i],
-                    new Vector2(x0, 0.892f), new Vector2(x1, 0.985f),
-                    new Color(0.025f, 0.037f, 0.042f, 0.91f), true);
-                AddOutline(buttonRoot, Border, 1f);
-
-                var button = buttonRoot.gameObject.AddComponent<Button>();
-                buttonRoot.GetComponent<Image>().raycastTarget = true;
-                button.targetGraphic = buttonRoot.GetComponent<Image>();
-                buttonRoot.gameObject.AddComponent<HudTopButton>();
+                var buttonRoot = CreateArtButton(root, labels[i],
+                    new Vector2(x0, 0.892f), new Vector2(x1, 0.985f), artSquareButton);
 
                 DrawTopIcon(buttonRoot, icons[i]);
                 CreateText(buttonRoot, "Label", labels[i],
@@ -701,6 +694,32 @@ namespace SurvivalGame.EditorTools
             return panel;
         }
 
+        private static RectTransform CreateArtButton(RectTransform parent, string name, Vector2 min, Vector2 max, Sprite sprite)
+        {
+            var rt = CreateRect(name, parent, min, max);
+            var image = rt.gameObject.AddComponent<Image>();
+            image.sprite = sprite;
+            image.color = Color.white;
+            image.preserveAspect = true;
+            image.raycastTarget = true;
+
+            var button = rt.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            rt.gameObject.AddComponent<HudTopButton>();
+            return rt;
+        }
+
+        private static Image CreateSpriteIcon(Transform parent, string name, Sprite sprite, Vector2 min, Vector2 max)
+        {
+            var rt = CreateRect(name, parent, min, max);
+            var image = rt.gameObject.AddComponent<Image>();
+            image.sprite = sprite;
+            image.color = Color.white;
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            return image;
+        }
+
         private static RectTransform CreatePanel(RectTransform parent, string name, Vector2 min, Vector2 max, Color color, bool rounded)
         {
             var rt = CreateRect(name, parent, min, max);
@@ -709,7 +728,7 @@ namespace SurvivalGame.EditorTools
             image.raycastTarget = false;
             if (rounded)
             {
-                image.sprite = roundedSprite;
+                image.sprite = artPanel ? artPanel : roundedSprite;
                 image.type = Image.Type.Sliced;
             }
             return rt;
@@ -847,7 +866,28 @@ namespace SurvivalGame.EditorTools
             string diskFolder = Path.Combine(Application.dataPath, "Generated/UI");
             Directory.CreateDirectory(diskFolder);
 
-            roundedSprite = EnsureSprite("rounded_panel", 64, 64, true, false);
+            ProductionUiArtGenerator.Ensure();
+
+            artPanel = ProductionUiArtGenerator.Load("ui_panel");
+            artCircleButton = ProductionUiArtGenerator.Load("ui_button_circle");
+            artSquareButton = ProductionUiArtGenerator.Load("ui_button_square");
+
+            iconBackpack = ProductionUiArtGenerator.Load("icon_backpack");
+            iconCraft = ProductionUiArtGenerator.Load("icon_craft");
+            iconInteract = ProductionUiArtGenerator.Load("icon_interact");
+            iconAim = ProductionUiArtGenerator.Load("icon_aim");
+            iconAxe = ProductionUiArtGenerator.Load("icon_axe");
+            iconHeart = ProductionUiArtGenerator.Load("icon_heart");
+            iconArmor = ProductionUiArtGenerator.Load("icon_armor");
+            iconFood = ProductionUiArtGenerator.Load("icon_food");
+            iconWater = ProductionUiArtGenerator.Load("icon_water");
+            iconShop = ProductionUiArtGenerator.Load("icon_shop");
+            iconBuild = ProductionUiArtGenerator.Load("icon_build");
+            iconEvent = ProductionUiArtGenerator.Load("icon_event");
+            iconCharacter = ProductionUiArtGenerator.Load("icon_character");
+            iconMenu = ProductionUiArtGenerator.Load("icon_menu");
+
+            roundedSprite = artPanel ? artPanel : EnsureSprite("rounded_panel", 64, 64, true, false);
             circleSprite = EnsureSprite("circle", 128, 128, false, false);
             ringSprite = EnsureSprite("ring", 128, 128, false, true);
         }
