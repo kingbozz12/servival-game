@@ -885,7 +885,7 @@ namespace SurvivalGame.EditorTools
             Directory.CreateDirectory(diskFolder);
 
             ProductionUiArtGenerator.Ensure();
-            CleanApprovedButtonGenerator.GenerateAll(force: true);
+            ApprovedButtonAssetInstaller.EnsureInstalled();
 
             approvedActionButton = LoadApprovedButton("action");
             approvedAimButton = LoadApprovedButton("aim");
