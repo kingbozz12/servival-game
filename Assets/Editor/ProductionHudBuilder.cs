@@ -66,7 +66,7 @@ namespace SurvivalGame.EditorTools
             BuildTopMenu(safe);
             BuildMinimap(safe, player);
             BuildJoystick(safe, player);
-            BuildActionCluster(safe);
+            BuildActionCluster(safe, player);
             var screens = BuildOverlayScreens(safe, player);
             BuildBottomUtilityButtons(safe, screens);
             BuildExpBar(safe, player);
@@ -335,7 +335,7 @@ namespace SurvivalGame.EditorTools
             BindObject(joystick, "handle", inner);
         }
 
-        private static void BuildActionCluster(RectTransform root)
+        private static void BuildActionCluster(RectTransform root, GameObject player)
         {
             var interact = CreateActionButton(root, "Interact",
                 new Vector2(0.785f, 0.175f), new Vector2(0.855f, 0.300f), "ВЗЯТЬ", false);
@@ -349,8 +349,19 @@ namespace SurvivalGame.EditorTools
 
             var main = CreateActionButton(root, "Context Action",
                 new Vector2(0.842f, 0.045f), new Vector2(0.947f, 0.235f), "ДЕЙСТВИЕ", true);
-            CreateSpriteIcon(main, "Context Icon", iconAxe,
+            var mainIcon = CreateSpriteIcon(main, "Context Icon", iconAxe,
                 new Vector2(0.22f, 0.27f), new Vector2(0.78f, 0.83f));
+
+            var actionPresenter = main.gameObject.AddComponent<PlayerActionButtonPresenter>();
+            var actionLabel = main.Find("Label") ? main.Find("Label").GetComponent<Text>() : null;
+            actionPresenter.Configure(
+                player.GetComponent<PlayerActionButtonState>(),
+                main.gameObject,
+                mainIcon,
+                actionLabel,
+                iconAxe,
+                iconAxe);
+            UnityEventTools.AddPersistentListener(main.GetComponent<Button>().onClick, actionPresenter.Press);
         }
 
 
