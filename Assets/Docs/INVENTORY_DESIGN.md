@@ -35,10 +35,13 @@ The inventory must NOT be a copy of Last Day on Earth.
 ## Starter state after character creation
 The character creator shows the male/female character in underwear.
 
-When the game starts, StarterLoadout grants and equips simple beginner gear:
+When the game starts, StarterLoadout grants and equips only simple beginner clothing:
 - basic T-shirt
 - simple pants
 - basic boots
-- small backpack
+
+The player starts with NO backpack.
+
+The first backpack must be crafted during gameplay from early resources. Equipping a backpack later can increase inventory slots and/or maximum carried weight.
 
 The actual art assets will be connected later; the code already supports these as separate equippable items.
