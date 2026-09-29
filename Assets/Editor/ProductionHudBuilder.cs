@@ -366,6 +366,7 @@ namespace SurvivalGame.EditorTools
                 new Color(0.025f, 0.035f, 0.040f, primary ? 0.97f : 0.91f));
 
             var button = buttonRoot.gameObject.AddComponent<Button>();
+            buttonRoot.GetComponent<Image>().raycastTarget = true;
             button.targetGraphic = buttonRoot.GetComponent<Image>();
             buttonRoot.gameObject.AddComponent<HudTopButton>();
 
