@@ -22,7 +22,7 @@ namespace SurvivalGame.EditorTools
     {
         private const string GeneratedFolder = "Assets/Generated";
         private const string ScenesFolder = "Assets/Scenes";
-        private const string Marker = GeneratedFolder + "/Prototype_v1.marker";
+        private const string Marker = GeneratedFolder + "/ProductionUI_v2.marker";
 
         static PrototypeAutoBuilder()
         {
@@ -189,7 +189,7 @@ namespace SurvivalGame.EditorTools
             CreateExitZone(new Vector3(28f, 0.5f, 0f), new Vector3(4f, 1f, 20f), loader);
             CreateExitZone(new Vector3(-28f, 0.5f, 0f), new Vector3(4f, 1f, 20f), loader);
 
-            CreateGameplayHud(player);
+            ProductionHudBuilder.Build(player);
 
             EditorSceneManager.SaveScene(scene, ScenesFolder + "/" + sceneName + ".unity");
         }
@@ -216,74 +216,6 @@ namespace SurvivalGame.EditorTools
                 CreateColorMaterial("PrototypePlayer", new Color(0.30f, 0.34f, 0.35f));
 
             return player;
-        }
-
-        private static void CreateGameplayHud(GameObject player)
-        {
-            var canvas = CreateCanvas("Gameplay HUD");
-
-            var topPanel = CreatePanel(canvas.transform, "Player HUD",
-                new Vector2(0.02f, 0.79f), new Vector2(0.31f, 0.98f),
-                new Color(0.025f, 0.035f, 0.04f, 0.82f));
-
-            var nickname = CreateText(topPanel.transform, "Nickname", "Player",
-                new Vector2(0.12f, 0.72f), new Vector2(0.62f, 0.96f), 24, TextAnchor.MiddleLeft);
-            var level = CreateText(topPanel.transform, "Level", "1",
-                new Vector2(0.75f, 0.72f), new Vector2(0.94f, 0.96f), 22, TextAnchor.MiddleCenter);
-
-            var healthBar = CreateSlider(topPanel.transform, "Health",
-                new Vector2(0.12f, 0.46f), new Vector2(0.65f, 0.64f));
-            var healthText = CreateText(topPanel.transform, "HealthText", "100 / 100",
-                new Vector2(0.67f, 0.44f), new Vector2(0.96f, 0.66f), 18, TextAnchor.MiddleCenter);
-
-            var armorBar = CreateSlider(topPanel.transform, "Armor",
-                new Vector2(0.12f, 0.24f), new Vector2(0.65f, 0.40f));
-            var armorText = CreateText(topPanel.transform, "ArmorText", "0 / 100",
-                new Vector2(0.67f, 0.20f), new Vector2(0.96f, 0.42f), 18, TextAnchor.MiddleCenter);
-
-            var foodText = CreateText(topPanel.transform, "Food", "🍖 100",
-                new Vector2(0.12f, 0.02f), new Vector2(0.42f, 0.20f), 19, TextAnchor.MiddleLeft);
-            var waterText = CreateText(topPanel.transform, "Water", "💧 100",
-                new Vector2(0.50f, 0.02f), new Vector2(0.82f, 0.20f), 19, TextAnchor.MiddleLeft);
-
-            var expBar = CreateSlider(canvas.transform, "EXP",
-                new Vector2(0.38f, 0.018f), new Vector2(0.62f, 0.032f));
-            var bottomLevel = CreateText(canvas.transform, "BottomLevel", "Ур. 1",
-                new Vector2(0.31f, 0.006f), new Vector2(0.38f, 0.048f), 16, TextAnchor.MiddleRight);
-            var expText = CreateText(canvas.transform, "EXPText", "0 / 100",
-                new Vector2(0.62f, 0.006f), new Vector2(0.70f, 0.048f), 16, TextAnchor.MiddleLeft);
-
-            var joystickBg = CreatePanel(canvas.transform, "Joystick",
-                new Vector2(0.035f, 0.055f), new Vector2(0.17f, 0.29f),
-                new Color(0.08f, 0.09f, 0.10f, 0.55f));
-            joystickBg.GetComponent<Image>().raycastTarget = true;
-            var handle = CreatePanel(joystickBg.transform, "Handle",
-                new Vector2(0.30f, 0.30f), new Vector2(0.70f, 0.70f),
-                new Color(0.65f, 0.68f, 0.70f, 0.78f));
-
-            var joystick = joystickBg.AddComponent<VirtualJoystick>();
-            joystick.Bind(player.GetComponent<MobileRunController>());
-            BindObject(joystick, "background", joystickBg.transform as RectTransform);
-            BindObject(joystick, "handle", handle.transform as RectTransform);
-
-            var presenter = canvas.gameObject.AddComponent<PlayerHudPresenter>();
-            BindObject(presenter, "vitals", player.GetComponent<PlayerVitals>());
-            BindObject(presenter, "progression", player.GetComponent<PlayerProgression>());
-            BindObject(presenter, "nicknameText", nickname);
-            BindObject(presenter, "levelText", level);
-            BindObject(presenter, "healthBar", healthBar);
-            BindObject(presenter, "healthText", healthText);
-            BindObject(presenter, "armorBar", armorBar);
-            BindObject(presenter, "armorText", armorText);
-            BindObject(presenter, "foodText", foodText);
-            BindObject(presenter, "waterText", waterText);
-            BindObject(presenter, "expBar", expBar);
-            BindObject(presenter, "bottomLevelText", bottomLevel);
-            BindObject(presenter, "expText", expText);
-
-            CreateText(canvas.transform, "PrototypeNote",
-                "ПРОТОТИП • финальный HUD будет заменён утверждённым артом",
-                new Vector2(0.72f, 0.94f), new Vector2(0.98f, 0.985f), 13, TextAnchor.MiddleRight);
         }
 
         private static void CreateExitZone(Vector3 position, Vector3 scale, LocationLoader loader)
