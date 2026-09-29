@@ -24,7 +24,7 @@ namespace SurvivalGame.EditorTools
     {
         private const string GeneratedFolder = "Assets/Generated";
         private const string ScenesFolder = "Assets/Scenes";
-        private const string Marker = GeneratedFolder + "/CleanButtons_v5.marker";
+        private const string Marker = GeneratedFolder + "/ExactApprovedButtons_v6.marker";
 
         static PrototypeAutoBuilder()
         {
