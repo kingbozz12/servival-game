@@ -407,45 +407,42 @@ namespace SurvivalGame.EditorTools
 
             public void RoundedRing(Rect rect, float radius, float thickness, Color color)
             {
-                var outer = new Raster(Width, Height);
-                outer.RoundedRect(rect, radius, color);
-                BlitRaw(outer);
-
-                var innerColor = new Color(0, 0, 0, 0);
-                Rect inner = new Rect(rect.x + thickness, rect.y + thickness,
-                    rect.width - thickness * 2, rect.height - thickness * 2);
-                ClearShape(inner, Mathf.Max(0, radius - thickness), innerColor);
-            }
-
-            private void ClearShape(Rect rect, float radius, Color ignored)
-            {
                 Vector2 center = rect.center;
                 Vector2 half = rect.size * 0.5f;
-                int minX = Mathf.Max(0, Mathf.FloorToInt(rect.xMin));
-                int maxX = Mathf.Min(Width - 1, Mathf.CeilToInt(rect.xMax));
-                int minY = Mathf.Max(0, Mathf.FloorToInt(rect.yMin));
-                int maxY = Mathf.Min(Height - 1, Mathf.CeilToInt(rect.yMax));
+                float outerRadius = Mathf.Max(0, radius);
+                float innerRadius = Mathf.Max(0, radius - thickness);
+                Vector2 innerHalf = half - new Vector2(thickness, thickness);
+
+                int minX = Mathf.FloorToInt(rect.xMin - 1);
+                int maxX = Mathf.CeilToInt(rect.xMax + 1);
+                int minY = Mathf.FloorToInt(rect.yMin - 1);
+                int maxY = Mathf.CeilToInt(rect.yMax + 1);
 
                 for (int y = minY; y <= maxY; y++)
                 {
                     for (int x = minX; x <= maxX; x++)
                     {
                         Vector2 p = new Vector2(x + 0.5f, y + 0.5f);
-                        Vector2 q = new Vector2(Mathf.Abs(p.x - center.x), Mathf.Abs(p.y - center.y))
-                                    - (half - new Vector2(radius, radius));
-                        Vector2 maxQ = new Vector2(Mathf.Max(q.x, 0), Mathf.Max(q.y, 0));
-                        float distance = maxQ.magnitude + Mathf.Min(Mathf.Max(q.x, q.y), 0) - radius;
-                        if (distance <= -0.25f)
-                            pixels[y * Width + x] = Color.clear;
+
+                        float outer = RoundedRectDistance(p, center, half, outerRadius);
+                        float inner = RoundedRectDistance(p, center, innerHalf, innerRadius);
+
+                        float outerCoverage = Mathf.Clamp01(0.75f - outer);
+                        float innerCoverage = Mathf.Clamp01(0.75f - inner);
+                        float coverage = Mathf.Clamp01(outerCoverage - innerCoverage);
+
+                        if (coverage > 0)
+                            Blend(x, y, color * new Color(1, 1, 1, coverage));
                     }
                 }
             }
 
-            private void BlitRaw(Raster other)
+            private static float RoundedRectDistance(Vector2 p, Vector2 center, Vector2 half, float radius)
             {
-                for (int i = 0; i < pixels.Length; i++)
-                    if (other.pixels[i].a > 0)
-                        pixels[i] = AlphaOver(pixels[i], other.pixels[i]);
+                Vector2 q = new Vector2(Mathf.Abs(p.x - center.x), Mathf.Abs(p.y - center.y))
+                            - (half - new Vector2(radius, radius));
+                Vector2 maxQ = new Vector2(Mathf.Max(q.x, 0), Mathf.Max(q.y, 0));
+                return maxQ.magnitude + Mathf.Min(Mathf.Max(q.x, q.y), 0) - radius;
             }
 
             public void Circle(Vector2 center, float radius, Color color)
@@ -589,7 +586,7 @@ namespace SurvivalGame.EditorTools
                     Vector2 pj = polygon[j];
                     bool intersect = ((pi.y > point.y) != (pj.y > point.y)) &&
                                      (point.x < (pj.x - pi.x) * (point.y - pi.y) /
-                                      Mathf.Max(0.00001f, pj.y - pi.y) + pi.x);
+                                      ((Mathf.Abs(pj.y - pi.y) < 0.00001f) ? 0.00001f : (pj.y - pi.y)) + pi.x);
                     if (intersect) inside = !inside;
                 }
                 return inside;
