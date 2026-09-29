@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using SurvivalGame.CameraSystem;
 using SurvivalGame.Character;
+using SurvivalGame.Combat;
+using SurvivalGame.Gathering;
 using SurvivalGame.Inventory;
 using SurvivalGame.Player;
 using SurvivalGame.UI;
@@ -210,7 +212,33 @@ namespace SurvivalGame.EditorTools
             player.AddComponent<MobileRunController>();
             player.AddComponent<PlayerVitals>();
             player.AddComponent<PlayerProgression>();
-            player.AddComponent<InventoryContainer>();
+
+            var inventory = player.AddComponent<InventoryContainer>();
+            var visualEquipment = player.AddComponent<EquipmentController>();
+            var equipment = player.AddComponent<EquipmentSystem>();
+            BindObject(equipment, "inventory", inventory);
+            BindObject(equipment, "visualController", visualEquipment);
+
+            var sensor = player.AddComponent<ResourceInteractionSensor>();
+            var sphere = player.GetComponent<SphereCollider>();
+            if (sphere)
+            {
+                sphere.isTrigger = true;
+                sphere.radius = 2f;
+            }
+
+            var gathering = player.AddComponent<GatherActionController>();
+            BindObject(gathering, "equipment", equipment);
+            BindObject(gathering, "inventory", inventory);
+            BindObject(gathering, "sensor", sensor);
+
+            var melee = player.AddComponent<MeleeAttackController>();
+            BindObject(melee, "equipment", equipment);
+            BindObject(melee, "attackOrigin", player.transform);
+
+            var actionState = player.AddComponent<PlayerActionButtonState>();
+            BindObject(actionState, "melee", melee);
+            BindObject(actionState, "gathering", gathering);
 
             player.GetComponent<Renderer>().sharedMaterial =
                 CreateColorMaterial("PrototypePlayer", new Color(0.30f, 0.34f, 0.35f));
