@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace SurvivalGame.Player
 {
@@ -26,10 +27,14 @@ namespace SurvivalGame.Player
         private void Update()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE
-            if (moveInput.sqrMagnitude < 0.001f)
+            if (moveInput.sqrMagnitude < 0.001f && Keyboard.current != null)
             {
-                moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-                moveInput = Vector2.ClampMagnitude(moveInput, 1f);
+                Vector2 keyboard = Vector2.zero;
+                if (Keyboard.current.aKey.isPressed) keyboard.x -= 1f;
+                if (Keyboard.current.dKey.isPressed) keyboard.x += 1f;
+                if (Keyboard.current.sKey.isPressed) keyboard.y -= 1f;
+                if (Keyboard.current.wKey.isPressed) keyboard.y += 1f;
+                moveInput = Vector2.ClampMagnitude(keyboard, 1f);
             }
 #endif
             Vector3 cameraForward = Camera.main
