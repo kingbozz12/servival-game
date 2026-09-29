@@ -43,6 +43,10 @@ Example:
 - No speaker button on the right side.
 - No chat button on the right side.
 - No prone / lie-down button.
+- No dedicated run button.
+- Walking/running is controlled by joystick strength:
+  - small/moderate joystick deflection = walk
+  - strong joystick deflection = run
 - Contextual tool/melee action behavior follows ACTION_CONTROLS.md.
 - Other movement/action buttons can be repositioned and refined later during real scene testing.
 
