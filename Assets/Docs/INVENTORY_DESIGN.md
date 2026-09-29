@@ -11,7 +11,8 @@ The inventory must NOT be a copy of Last Day on Earth.
 - Weight shown as current / maximum
 - Separate equipment screen with full character preview
 - Detailed item card for weapons, armor and consumables
-- Quick bar remains visible in gameplay
+- No permanent item quick-slot strip in gameplay
+- Backpack is opened from a permanent bottom-right backpack button
 
 ## Distinctive mechanics
 1. Weight + slot limit at the same time.
@@ -26,8 +27,8 @@ The inventory must NOT be a copy of Last Day on Earth.
 4. Durability.
    Weapons and armor support durability and repair.
 
-5. Context quick bar.
-   Four slots for frequently used items; consumables can be used without opening inventory.
+5. Fast inventory access.
+   The backpack has a permanent bottom-right HUD button. Consumable shortcuts can be revisited later if needed, but there is no permanent four-slot strip.
 
 6. Sort/filter.
    Categories plus one-tap sorting by type/name.
