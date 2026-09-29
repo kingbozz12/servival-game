@@ -20,6 +20,8 @@ namespace SurvivalGame.Inventory
         [Header("Equipment")]
         public bool equippable;
         public EquipmentSlot equipmentSlot;
+        public ItemUseMode useMode;
+        public ToolType toolType;
 
         [Header("Combat / protection")]
         [Min(0)] public int damage;
@@ -27,6 +29,9 @@ namespace SurvivalGame.Inventory
         [Min(0)] public int durabilityMax;
         [Min(0f)] public float attackSpeed = 1f;
         [Min(0f)] public float range = 1f;
+
+        [Header("Gathering")]
+        [Min(0)] public int gatherPower = 1;
 
         [Header("Survival")]
         public int healthRestore;
