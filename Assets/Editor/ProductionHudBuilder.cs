@@ -47,6 +47,7 @@ namespace SurvivalGame.EditorTools
             BuildMinimap(safe, player);
             BuildJoystick(safe, player);
             BuildActionCluster(safe);
+            BuildBottomUtilityButtons(safe);
             BuildExpBar(safe, player);
         }
 
@@ -186,12 +187,12 @@ namespace SurvivalGame.EditorTools
 
         private static void BuildTopMenu(RectTransform root)
         {
-            string[] labels = { "МАГАЗИН", "КРАФТ", "СТРОЙКА", "СОБЫТИЯ", "ПЕРСОНАЖ", "МЕНЮ" };
-            TopIcon[] icons = { TopIcon.Shop, TopIcon.Craft, TopIcon.Build, TopIcon.Event, TopIcon.Character, TopIcon.Menu };
+            string[] labels = { "МАГАЗИН", "СТРОЙКА", "СОБЫТИЯ", "ПЕРСОНАЖ", "МЕНЮ" };
+            TopIcon[] icons = { TopIcon.Shop, TopIcon.Build, TopIcon.Event, TopIcon.Character, TopIcon.Menu };
 
             float width = 0.059f;
             float gap = 0.007f;
-            float start = 0.605f;
+            float start = 0.665f;
 
             for (int i = 0; i < labels.Length; i++)
             {
@@ -355,6 +356,61 @@ namespace SurvivalGame.EditorTools
             var main = CreateActionButton(root, "Context Action",
                 new Vector2(0.842f, 0.045f), new Vector2(0.947f, 0.235f), "ДЕЙСТВИЕ", true);
             DrawToolGlyph(main);
+        }
+
+
+        private static void BuildBottomUtilityButtons(RectTransform root)
+        {
+            var craft = CreateUtilityButton(root, "Craft Quick Button",
+                new Vector2(0.936f, 0.285f), new Vector2(0.988f, 0.378f), "КРАФТ");
+            DrawCraftGlyph(craft);
+
+            var backpack = CreateUtilityButton(root, "Backpack Quick Button",
+                new Vector2(0.936f, 0.180f), new Vector2(0.988f, 0.273f), "РЮКЗАК");
+            DrawBackpackGlyph(backpack);
+        }
+
+        private static RectTransform CreateUtilityButton(RectTransform root, string name, Vector2 min, Vector2 max, string label)
+        {
+            var frame = CreateCircle(root, name + " Frame", min, max,
+                new Color(0.54f, 0.61f, 0.62f, 0.72f));
+            var buttonRoot = CreateCircle(frame, name,
+                new Vector2(0.045f, 0.045f), new Vector2(0.955f, 0.955f),
+                new Color(0.025f, 0.037f, 0.042f, 0.96f));
+
+            var image = buttonRoot.GetComponent<Image>();
+            image.raycastTarget = true;
+
+            var button = buttonRoot.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            buttonRoot.gameObject.AddComponent<HudTopButton>();
+
+            CreateText(buttonRoot, "Label", label,
+                new Vector2(0.05f, 0.02f), new Vector2(0.95f, 0.22f),
+                10, TextAnchor.MiddleCenter, TextMuted);
+
+            return buttonRoot;
+        }
+
+        private static void DrawBackpackGlyph(RectTransform parent)
+        {
+            var bag = CreatePanel(parent, "Bag",
+                new Vector2(0.29f, 0.29f), new Vector2(0.71f, 0.73f), TextPrimary, true);
+            CreatePanel(parent, "Top Strap",
+                new Vector2(0.40f, 0.67f), new Vector2(0.60f, 0.82f), TextPrimary, true);
+            CreatePanel(parent, "Pocket",
+                new Vector2(0.36f, 0.34f), new Vector2(0.64f, 0.48f),
+                new Color(0.10f, 0.13f, 0.14f, 1f), true);
+            CreateIconBar(parent, new Vector2(0.21f, 0.37f), new Vector2(0.30f, 0.68f), -8f);
+            CreateIconBar(parent, new Vector2(0.70f, 0.37f), new Vector2(0.79f, 0.68f), 8f);
+        }
+
+        private static void DrawCraftGlyph(RectTransform parent)
+        {
+            CreateIconBar(parent, new Vector2(0.30f, 0.28f), new Vector2(0.39f, 0.73f), 38f);
+            CreateIconBar(parent, new Vector2(0.61f, 0.28f), new Vector2(0.70f, 0.73f), -38f);
+            CreateCircle(parent, "Joint",
+                new Vector2(0.43f, 0.43f), new Vector2(0.57f, 0.57f), Warm);
         }
 
         private static RectTransform CreateActionButton(RectTransform root, string name, Vector2 min, Vector2 max, string label, bool primary)
