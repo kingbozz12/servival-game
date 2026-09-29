@@ -44,6 +44,8 @@ Example:
 - No chat button on the right side.
 - No prone / lie-down button.
 - No dedicated run button.
+- Backpack and Craft are permanent quick buttons at the bottom-right.
+- Craft is not duplicated in the top menu.
 - There is NO walking state during normal joystick movement.
 - Any joystick movement immediately uses the run locomotion state.
 - Joystick magnitude controls movement direction/input strength only; it does not switch to walking.
